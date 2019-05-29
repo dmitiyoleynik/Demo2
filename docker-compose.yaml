@@ -35,12 +35,16 @@ services:
             - "1433:1433"
         networks:
         - back-tier
+        volumes:
+            - mssql:/var/opt/mssql/data
         environment:
             SA_PASSWORD: "Password1"
             ACCEPT_EULA: "Y"
             MSSQL_PID: Express
 
-
+volumes: 
+  mssql:
+    driver: local  
 networks:
   front-tier:
     driver: bridge
