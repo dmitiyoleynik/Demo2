@@ -1,0 +1,50 @@
+version: '2'
+
+services:
+    web:
+        image: dmitrooliinik/second_demo_oliinik_dmitro #eb6b5ae80588
+        depends_on:
+            - mssql
+        ports:
+            - "5106:80"
+        networks:
+            - back-tier
+        environment: 
+            ASPNETCORE_ENVIRONMENT: "Development"
+    
+ 
+    loadbalancer:
+        image: 'dockercloud/haproxy:latest'
+        links:
+        - web
+        volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+        - 8080:80
+        networks:
+        - front-tier
+        - back-tier
+        environment:
+        - BALANCE=source
+  
+
+    mssql:
+        image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+        container_name: mssql
+        ports: 
+            - "1433:1433"
+        networks:
+        - back-tier
+        environment:
+            SA_PASSWORD: "Password1"
+            ACCEPT_EULA: "Y"
+            MSSQL_PID: Express
+
+
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
+    internal: true
+
